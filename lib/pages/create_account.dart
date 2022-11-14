@@ -20,14 +20,16 @@ class _CreateAccountState extends State<CreateAccount> {
       type: MaskAutoCompletionType.lazy);
 
   submit() {
+    print("1a");
     final form = _formKey.currentState;
     if (form!.validate()) {
       form.save();
-      SnackBar snackbar = const SnackBar(content: Text("Conta criada com sucesso!"));
-      _scaffoldKey.currentState!.showSnackBar(snackbar);
-      Timer(const Duration(seconds: 2), () {
+     // SnackBar snackbar = const SnackBar(content: Text("Conta criada com sucesso!"));
+      //_scaffoldKey.currentState!.showSnackBar(snackbar);
+      //Timer(const Duration(seconds: 2), () {
         Navigator.pop(context, phoneNumber);
-      });
+        print("1");
+     // });
     }
   }
 
@@ -115,7 +117,8 @@ class _CreateAccountState extends State<CreateAccount> {
                       ),
                     ),
                   ),
-                  GestureDetector(
+                  ElevatedButton(onPressed: submit, child: Text("ir"))
+                  /*GestureDetector(
                     onTap: submit,
                     child: Container(
                       height: 50.0,
@@ -136,7 +139,7 @@ class _CreateAccountState extends State<CreateAccount> {
                         ),
                       ),
                     ),
-                  ),
+                  ),*/
                 ],
               ),
             ),

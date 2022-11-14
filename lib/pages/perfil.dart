@@ -5,6 +5,7 @@ import 'package:lost_pet/pages/atividade.dart';
 import 'package:lost_pet/pages/configuracoes.dart';
 import 'package:lost_pet/pages/encontrados.dart';
 import 'package:lost_pet/pages/home.dart';
+import 'package:lost_pet/pages/perdidos.dart';
 import 'package:lost_pet/widgets/progress.dart';
 
 import '../models/User/user.dart';
@@ -21,10 +22,12 @@ class Perfil extends StatefulWidget {
 class _PerfilState extends State<Perfil> {
   bool isLoading = false;
   List<Encontrados> encontrados = [];
+  List<Perdidos> perdidos = [];
   String qualPost = "Encontrados";
   @override
   initState() {
     super.initState();
+    getPerdidosPost();
     getEncontradosPost();
   }
 
@@ -41,6 +44,22 @@ class _PerfilState extends State<Perfil> {
       isLoading = false;
       encontrados =
           snapshot.docs.map((doc) => Encontrados.fromDocument(doc)).toList();
+    });
+  }
+
+  getPerdidosPost() async {
+    setState(() {
+      isLoading = true;
+    });
+    QuerySnapshot snapshot = await perdidosRef
+        .doc(widget.profileId)
+        .collection('userPerdidos')
+        .orderBy('timestamp', descending: true)
+        .get();
+    setState(() {
+      isLoading = false;
+      perdidos =
+          snapshot.docs.map((doc) => Perdidos.fromDocument(doc)).toList();
     });
   }
 
@@ -68,8 +87,8 @@ class _PerfilState extends State<Perfil> {
 
           return Container(
             color: const Color.fromARGB(255, 240, 240, 240),
-            padding: const EdgeInsets.only(
-                left: 15.0, bottom: 30.0, right: 15.0),
+            padding:
+                const EdgeInsets.only(left: 15.0, bottom: 30.0, right: 15.0),
             child: Column(
               children: [
                 ListTile(
@@ -85,7 +104,11 @@ class _PerfilState extends State<Perfil> {
                   ),
                   trailing: IconButton(
                     onPressed: buttonAtividade,
-                    icon: const Icon(Icons.notifications_active, color: Colors.yellow,),
+                    icon: const Icon(
+                      Icons.notifications_active_rounded,
+                      color: Color.fromARGB(255, 212, 218, 16),
+                      size: 30,
+                    ),
                   ),
                 ),
                 Padding(
@@ -185,9 +208,7 @@ class _PerfilState extends State<Perfil> {
               child: Text(
                 "Publicações de\n Encontrados",
                 style: TextStyle(
-                  color: qualPost == "Encontrados"
-                      ? const Color.fromARGB(255, 208, 54, 106)
-                      : Colors.black,
+                  fontWeight: qualPost == "Encontrados" ? FontWeight.w700 : FontWeight.normal,
                   fontFamily: "Inter",
                   fontSize: 14.0,
                 ),
@@ -208,9 +229,7 @@ class _PerfilState extends State<Perfil> {
               child: Text(
                 "Publicações de\n Perdidos",
                 style: TextStyle(
-                  color: qualPost == "Perdidos"
-                      ? const Color.fromARGB(255, 208, 54, 106)
-                      : Colors.black,
+                  fontWeight: qualPost == "Perdidos" ? FontWeight.w700 : FontWeight.normal,
                   fontFamily: "Inter",
                   fontSize: 14.0,
                 ),
@@ -226,48 +245,107 @@ class _PerfilState extends State<Perfil> {
   buildPerfilPost() {
     if (isLoading) {
       return circularProgress();
-    } else if (encontrados.isEmpty) {
-      return Container(
-        alignment: Alignment.center,
-        child: Row(
-          children: const [Icon(Icons.mood_bad), Text("Nada por aqui!")],
-        ),
-      );
     } else if (qualPost == "Encontrados") {
-      return Column(
-        children: encontrados,
-      );
-    } else if (qualPost == "Perdidos") {
-      return Center(
-        widthFactor: 100,
-        child: Container(
-          alignment: Alignment.center,
-          width: MediaQuery.of(context).size.width * 1,
-          height: MediaQuery.of(context).size.height * 0.50,
+      if (encontrados.isEmpty) {
+        return Container(
           color: const Color.fromARGB(255, 240, 240, 240),
-          child: Row(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: const [
-              Icon(Icons.mood_bad),
+              Padding(
+                padding: EdgeInsets.only(top: 100, bottom: 20),
+                child: Icon(
+                  Icons.info_outline,
+                  size: 100,
+                  color: Color.fromARGB(255, 145, 139, 139),
+                ),
+              ),
               Text(
-                "Nada por aqui!",
+                "Tudo quieto por aqui!",
                 style: TextStyle(
                   color: Colors.black,
                   fontFamily: "Inter",
-                  fontSize: 16.0,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 24.0,
                 ),
                 textAlign: TextAlign.center,
               ),
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 50),
+                child: Text(
+                  "Quando encontrar um cachorro sem dono na rua, poste aqui no aplicativo. "
+                  "Você pode estar ajudando alguém.",
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontFamily: "Inter",
+                    fontSize: 16.0,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
             ],
           ),
-        ),
-      );
-      ;
+        );
+      } else {
+        return Column(
+          children: encontrados,
+        );
+      }
+    } else if (qualPost == "Perdidos") {
+      if (perdidos.isEmpty) {
+        return Container(
+          color: const Color.fromARGB(255, 240, 240, 240),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: const [
+              Padding(
+                padding: EdgeInsets.only(top: 100, bottom: 20),
+                child: Icon(
+                  Icons.info_outline,
+                  size: 100,
+                  color: Color.fromARGB(255, 145, 139, 139),
+                ),
+              ),
+              Text(
+                "Tudo quieto por aqui!",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontFamily: "Inter",
+                  fontWeight: FontWeight.w700,
+                  fontSize: 24.0,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 50),
+                child: Text(
+                  "Se você ou alguém próximo está com seu amiguinho desaparecido, poste aqui no aplicativo, "
+                  "alguém pode ajudar você.",
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontFamily: "Inter",
+                    fontSize: 16.0,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
+          ),
+        );
+      } else {
+        return Column(
+          children: perdidos,
+        );
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 240, 240, 240),
       body: ListView(
         children: [
           buildProfileHeader(),

@@ -23,9 +23,10 @@ class EncontradosScreen extends StatelessWidget {
         return Center(
           child: Scaffold(
             appBar: header(context, titleText: "Encontrado"),
-            body: PageView(
+            body: ListView(
               children: [
                 Container(
+                  height: MediaQuery.of(context).size.height * 1,
                   child: encontrados,
                 )
               ],

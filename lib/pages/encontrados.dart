@@ -2,10 +2,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:lost_pet/pages/home.dart';
+import 'package:lost_pet/pages/publicar_encontrado.dart';
 import 'package:lost_pet/widgets/progress.dart';
-import 'package:intl/intl.dart';
 import 'package:timeago/timeago.dart' as timeago;
-
+import 'package:timeago/timeago.dart' as timeago;
 import '../models/User/user.dart';
 import '../widgets/custom_image.dart';
 
@@ -60,19 +60,6 @@ class Encontrados extends StatefulWidget {
         sinalizar: doc['sinalizar']);
   }
 
-  int getSinalizarCount(sinalizar) {
-    if (sinalizar == null) {
-      return 0;
-    }
-    int count = 0;
-    sinalizar.values.forEach((val) {
-      if (val == true) {
-        count += 1;
-      }
-    });
-    return count;
-  }
-
   @override
   State<Encontrados> createState() => _EncontradosState(
       cor: this.cor,
@@ -87,8 +74,7 @@ class Encontrados extends StatefulWidget {
       sinalizar: this.sinalizar,
       estado: this.estado,
       cidade: this.cidade,
-      timestamp: this.timestamp,
-      sinalizarCount: getSinalizarCount(this.sinalizar));
+      timestamp: this.timestamp);
 }
 
 class _EncontradosState extends State<Encontrados> {
@@ -105,7 +91,6 @@ class _EncontradosState extends State<Encontrados> {
   final String estado;
   final String cidade;
   final Timestamp timestamp;
-  int sinalizarCount;
   Map sinalizar;
 
   _EncontradosState(
@@ -118,11 +103,17 @@ class _EncontradosState extends State<Encontrados> {
       required this.raca,
       required this.userId,
       required this.username,
-      required this.sinalizarCount,
       required this.cidade,
       required this.estado,
       required this.timestamp,
       required this.sinalizar});
+
+  @override
+  initState() {
+    if (sinalizar[currentUserId] == null) {
+      sinalizar[currentUserId] = false;
+    }
+  }
 
   sinalizarEncontrados() {
     if (sinalizar[currentUserId] == true) {
@@ -133,10 +124,8 @@ class _EncontradosState extends State<Encontrados> {
           .update({'sinalizar.$currentUserId': false});
       removeSinalizarAtividade();
       setState(() {
-        sinalizarCount -= 1;
         sinalizar[currentUserId] = false;
       });
-
     } else if (sinalizar[currentUserId] == false) {
       encontradosRef
           .doc(userId)
@@ -145,39 +134,124 @@ class _EncontradosState extends State<Encontrados> {
           .update({'sinalizar.$currentUserId': true});
       addSinalizarAtividade();
       setState(() {
-        sinalizarCount += 1;
         sinalizar[currentUserId] = true;
       });
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Quando você sinaliza o usuário poderá ver seu número de celular para entrar em contato!'),
+        content: Text(
+            'Quando você sinaliza o usuário poderá ver seu número de celular para entrar em contato!'),
         duration: Duration(milliseconds: 5000),
       ));
     }
   }
 
-  addSinalizarAtividade(){
+  addSinalizarAtividade() {
     //if(currentUserId != userId){
-      atividadeRef.doc(userId).collection("feedItems").doc(postId).set({
-        "type": "sinalizar",
-        "username": currentUser?.displayName,
-        "numero": currentUser?.phoneNumber,
-        "userId": currentUser?.id,
-        "userImg": currentUser?.photoUrl,
-        "postId":postId,
-        "mediaUrl": mediaUrl,
-        "timestamp": agora,
-      });
-   // }
+    atividadeRef.doc(userId).collection("feedItems").doc(postId).set({
+      "type": "sinalizar",
+      "username": currentUser?.displayName,
+      "numero": currentUser?.phoneNumber,
+      "userId": currentUser?.id,
+      "userImg": currentUser?.photoUrl,
+      "postId": postId,
+      "mediaUrl": mediaUrl,
+      "timestamp": agora,
+    });
+    // }
   }
 
-  removeSinalizarAtividade(){
+  removeSinalizarAtividade() {
     //if(currentUserId != userId) {
-      atividadeRef.doc(userId).collection("feedItems").doc(postId).get().then((docs) {
-        if(docs.exists){
-          docs.reference.delete();
-        }
-      });
-   // }
+    atividadeRef
+        .doc(userId)
+        .collection("feedItems")
+        .doc(postId)
+        .get()
+        .then((docs) {
+      if (docs.exists) {
+        docs.reference.delete();
+      }
+    });
+    // }
+  }
+
+  Icon exibirSinalizar() {
+    if (sinalizar[currentUserId] == true && sinalizar[currentUserId] != null) {
+      return const Icon(
+        Icons.flag,
+        color: Colors.yellow,
+        size: 35,
+      );
+    } else {
+      return const Icon(
+        Icons.outlined_flag,
+        color: Colors.yellow,
+        size: 35,
+      );
+    }
+  }
+
+  handleDeleteEncontrados(BuildContext parentContext) {
+    return showDialog(
+        context: parentContext,
+        builder: (context) {
+          return SimpleDialog(
+            title: const Text("Excluir publicação?"),
+            children: [
+              SimpleDialogOption(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) =>Home()),
+                  );
+                  deletePost();
+                },
+                child: const Text(
+                  "Deletar",
+                  style: TextStyle(color: Colors.red),
+                ),
+              ),
+              SimpleDialogOption(
+                onPressed: () => Navigator.pop(context),
+                child: Text("Cancelar"),
+              ),
+            ],
+          );
+        });
+  }
+
+  deletePost() async {
+    //Deletar post Encontrados
+    encontradosRef
+        .doc(userId)
+        .collection("userEncontrados")
+        .doc(postId)
+        .get()
+        .then((value) {
+      if (value.exists) {
+        value.reference.delete();
+      }
+    });
+    //Deletar Imagem
+    storageRef.child("post_$postId.jpg").delete();
+
+    //Deletar Notificações daquele post
+    QuerySnapshot atividadeSnapshot = await atividadeRef
+        .doc(userId)
+        .collection("feedItems")
+        .where('postId', isEqualTo: postId)
+        .get();
+    atividadeSnapshot.docs.forEach((value) {
+      if (value.exists) {
+        value.reference.delete();
+      }
+    });
+
+    //Deletar da timeline
+    timelineEncontradosRef.doc(postId).get().then((value) {
+      if (value.exists) {
+        value.reference.delete();
+      }
+    });
   }
 
   buildPostEncontrados() {
@@ -189,6 +263,7 @@ class _EncontradosState extends State<Encontrados> {
         }
         timeago.setLocaleMessages('pt_BR', timeago.PtBrMessages());
         User user = User.fromDocument(snapshot.data!);
+        bool postOwner = currentUserId == userId;
         return Column(
           children: [
             Column(
@@ -210,56 +285,60 @@ class _EncontradosState extends State<Encontrados> {
                         fontFamily: "Inter",
                       ),
                     ),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.more_vert),
-                      onPressed: () {},
-                    ),
+                    trailing: postOwner
+                        ? IconButton(
+                            icon: const Icon(Icons.more_vert),
+                            onPressed: () => handleDeleteEncontrados(context),
+                          )
+                        : const Text(''),
                   ),
                 ),
-                Stack(
+                Container(
+                  margin: const EdgeInsets.all(0),
+                  padding: const EdgeInsets.only(bottom: 1),
+                ),
+                Row(
                   children: [
-                    cachedNetworkImage(mediaUrl),
                     Container(
-                      height: 40.0,
-                      width: 130.0,
-                      margin: const EdgeInsets.only(top: 10, left: 20),
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                            color: const Color.fromARGB(255, 208, 54, 106)),
-                        borderRadius: BorderRadius.circular(10),
-                        color: const Color.fromARGB(255, 240, 240, 240),
-                      ),
-                      child: Row(
-                        children: [
-                          const Padding(
-                            padding: EdgeInsets.only(right: 5.0),
-                            child: Icon(
-                              Icons.access_time,
-                              color: Color.fromARGB(255, 208, 54, 106),
-                            ),
+                      margin: const EdgeInsets.all(0),
+                      padding:
+                          const EdgeInsets.only(top: 0, left: 15.0, bottom: 10),
+                      child: RichText(
+                        text: TextSpan(
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: Colors.black,
+                            fontFamily: "Inter",
                           ),
-                          Text(
-                            timeago.format(timestamp.toDate(), locale: 'pt_BR'),
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: Colors.black,
-                              fontFamily: "Inter",
+                          children: [
+                            const TextSpan(
+                              text: "Encontrado ",
                             ),
-                          ),
-                        ],
+                            TextSpan(
+                              text: timeago.format(timestamp.toDate(),
+                                  locale: 'pt_BR'),
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black,
+                                fontFamily: "Inter",
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],
                 ),
+                Stack(
+                  children: [
+                    cachedNetworkImage(mediaUrl),
+                  ],
+                ),
                 ListTile(
-                  leading: const Icon(
-                    Icons.pets,
-                    color: Color.fromARGB(255, 208, 54, 106),
-                  ),
                   title: Text(
                     raca,
-                    textAlign: TextAlign.center,
+                    textAlign: TextAlign.left,
                     style: const TextStyle(
                       fontSize: 18,
                       color: Colors.black,
@@ -273,8 +352,8 @@ class _EncontradosState extends State<Encontrados> {
                       sinalizar[currentUserId]
                           ? Icons.flag
                           : Icons.outlined_flag,
-                      color: Colors.yellow,
-                      size: 40,
+                      color: const Color.fromARGB(255, 212, 218, 16),
+                      size: 30,
                     ),
                   ),
                 ),

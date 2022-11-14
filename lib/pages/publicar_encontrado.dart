@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'dart:ui';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lost_pet/models/User/user.dart';
@@ -90,63 +89,65 @@ class _PublicarEncontradoState extends State<PublicarEncontrado> {
 
   Scaffold escolherFoto() {
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.only(
-            left: 15.0, top: 30.0, bottom: 30.0, right: 15.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Row(
-              children: const [
-                Text(
-                  "Tire foto dos cachorros\nandando na rua",
-                  style: TextStyle(
-                    fontFamily: "Inter",
-                    fontWeight: FontWeight.bold,
-                    fontSize: 24.0,
-                  ),
-                ),
-              ],
-            ),
-            const Padding(
-              padding: EdgeInsets.only(top: 10.0, bottom: 30.0),
-              child: Text(
-                "Você pode ajudar alguém a achar seu cachorro perdido.",
-                style: TextStyle(
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.normal,
-                  fontFamily: "Inter",
-                ),
-              ),
-            ),
-            Container(
-              height: MediaQuery.of(context).size.height * 0.61,
-              width: MediaQuery.of(context).size.width,
-              child: Container(
-                alignment: Alignment.center,
-                padding: const EdgeInsets.all(2.0),
-                child: ElevatedButton(
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(
-                        const Color.fromARGB(255, 216, 78, 132)),
-                    padding: MaterialStateProperty.all(
-                        const EdgeInsets.symmetric(
-                            vertical: 15.0, horizontal: 60.0)),
-                  ),
-                  onPressed: () => selectImage(context),
-                  child: const Text(
-                    "Selecionar foto",
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.only(
+              left: 15.0, top: 30.0, bottom: 30.0, right: 15.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Row(
+                children: const [
+                  Text(
+                    "Tire foto dos cachorros\nandando na rua",
                     style: TextStyle(
                       fontFamily: "Inter",
-                      color: Colors.white,
-                      fontSize: 18.0,
                       fontWeight: FontWeight.bold,
+                      fontSize: 24.0,
+                    ),
+                  ),
+                ],
+              ),
+              const Padding(
+                padding: EdgeInsets.only(top: 10.0),
+                child: Text(
+                  "Você pode ajudar alguém a achar seu cachorro perdido.",
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.normal,
+                    fontFamily: "Inter",
+                  ),
+                ),
+              ),
+              Container(
+                height: MediaQuery.of(context).size.height * 0.61,
+                width: MediaQuery.of(context).size.width,
+                child: Container(
+                  alignment: Alignment.center,
+                  padding: const EdgeInsets.all(2.0),
+                  child: ElevatedButton(
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(
+                          const Color.fromARGB(255, 216, 78, 132)),
+                      padding: MaterialStateProperty.all(
+                          const EdgeInsets.symmetric(
+                              vertical: 15.0, horizontal: 60.0)),
+                    ),
+                    onPressed: () => selectImage(context),
+                    child: const Text(
+                      "Selecionar foto",
+                      style: TextStyle(
+                        fontFamily: "Inter",
+                        color: Colors.white,
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
-              ),
-            )
-          ],
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -183,6 +184,26 @@ class _PublicarEncontradoState extends State<PublicarEncontrado> {
     encontradosRef
         .doc(widget.currentUser?.id)
         .collection("userEncontrados")
+        .doc(postId)
+        .set({
+      "postId": postId,
+      "userId": widget.currentUser?.id,
+      "username": widget.currentUser?.displayName,
+      "mediaUrl": mediaUrl,
+      "raca": raca,
+      "identificacao": identificacao,
+      "porte": porte,
+      "cor": cor,
+      "detalhes": detalhes,
+      "timestamp": timestamp,
+      "cidade": cidade,
+      "estado": estado,
+      "sinalizar": sinalizar
+
+
+    });
+
+    timelineEncontradosRef
         .doc(postId)
         .set({
       "postId": postId,
