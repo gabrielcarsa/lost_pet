@@ -24,12 +24,12 @@ class _CreateAccountState extends State<CreateAccount> {
     final form = _formKey.currentState;
     if (form!.validate()) {
       form.save();
-     // SnackBar snackbar = const SnackBar(content: Text("Conta criada com sucesso!"));
+      // SnackBar snackbar = const SnackBar(content: Text("Conta criada com sucesso!"));
       //_scaffoldKey.currentState!.showSnackBar(snackbar);
       //Timer(const Duration(seconds: 2), () {
-        Navigator.pop(context, phoneNumber);
-        print("1");
-     // });
+      Navigator.pop(context, phoneNumber);
+      print("1");
+      // });
     }
   }
 
@@ -56,7 +56,8 @@ class _CreateAccountState extends State<CreateAccount> {
                             fit: BoxFit.cover,
                           ),
                           border: Border.all(color: Colors.black, width: 2.0),
-                          borderRadius: BorderRadiusDirectional.circular(100.0)),
+                          borderRadius:
+                              BorderRadiusDirectional.circular(100.0)),
                     ),
                   ),
                   const Padding(
@@ -74,7 +75,7 @@ class _CreateAccountState extends State<CreateAccount> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(top:16.0,bottom: 16.0),
+                    padding: const EdgeInsets.only(top: 16.0, bottom: 16.0),
                     child: Container(
                       child: Form(
                         key: _formKey,
@@ -107,17 +108,23 @@ class _CreateAccountState extends State<CreateAccount> {
                     ),
                   ),
                   const Padding(
-                    padding: EdgeInsets.only(top: 10.0,bottom: 40.0),
+                    padding: EdgeInsets.only(top: 10.0, bottom: 40.0),
                     child: Text(
                       "Ninguém poderá visualizar seu "
-                          "número ao menos que na hora de alguma publicação você autorize.",
+                      "número ao menos que na você sinalize em alguma publicação.",
                       style: TextStyle(
                         fontFamily: "Inter",
                         color: Color.fromARGB(210, 129, 133, 138),
                       ),
                     ),
                   ),
-                  ElevatedButton(onPressed: submit, child: Text("ir"))
+                  ElevatedButton(
+                    onPressed: submit,
+                    style: ButtonStyle(
+                      padding: MaterialStateProperty.all(EdgeInsets.symmetric(horizontal: 40,vertical: 15)),
+                    ),
+                    child: Text("Enviar", style: TextStyle(fontSize: 16),),
+                  )
                   /*GestureDetector(
                     onTap: submit,
                     child: Container(

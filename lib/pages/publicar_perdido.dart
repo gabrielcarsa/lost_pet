@@ -109,7 +109,7 @@ class _PublicarPerdidoState extends State<PublicarPerdido> {
               const Padding(
                 padding: EdgeInsets.only(top: 10.0),
                 child: Text(
-                  "Vamos te ajudar! Publique a imagem do seu cachorro com algumas informções para que a comunidade possa te ajudar.",
+                  "Vamos te ajudar! Publique a imagem do seu cachorro que se perdeu com algumas informações para que a comunidade possa te ajudar.",
                   style: TextStyle(
                     fontSize: 16.0,
                     fontWeight: FontWeight.normal,

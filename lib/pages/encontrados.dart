@@ -1,7 +1,10 @@
+import 'dart:developer';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:lost_pet/pages/home.dart';
+import 'package:lost_pet/pages/perfil.dart';
 import 'package:lost_pet/pages/publicar_encontrado.dart';
 import 'package:lost_pet/widgets/progress.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -201,7 +204,7 @@ class _EncontradosState extends State<Encontrados> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) =>Home()),
+                    MaterialPageRoute(builder: (context) => Home()),
                   );
                   deletePost();
                 },

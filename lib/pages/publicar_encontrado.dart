@@ -111,7 +111,7 @@ class _PublicarEncontradoState extends State<PublicarEncontrado> {
               const Padding(
                 padding: EdgeInsets.only(top: 10.0),
                 child: Text(
-                  "Você pode ajudar alguém a achar seu cachorro perdido.",
+                  "Você pode ajudar alguém a achar um cachorro que está perdido.",
                   style: TextStyle(
                     fontSize: 16.0,
                     fontWeight: FontWeight.normal,

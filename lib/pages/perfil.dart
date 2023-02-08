@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +15,7 @@ import '../models/User/user.dart';
 class Perfil extends StatefulWidget {
   final String? profileId;
 
+
   const Perfil({Key? key, this.profileId}) : super(key: key);
 
   @override
@@ -26,6 +29,7 @@ class _PerfilState extends State<Perfil> {
   String qualPost = "Encontrados";
   @override
   initState() {
+
     super.initState();
     getPerdidosPost();
     getEncontradosPost();
@@ -77,12 +81,14 @@ class _PerfilState extends State<Perfil> {
   }
 
   buildProfileHeader() {
+
     return FutureBuilder<DocumentSnapshot>(
         future: usersRef.doc(widget.profileId).get(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return circularProgress();
           }
+
           User user = User.fromDocument(snapshot.data!);
 
           return Container(
@@ -344,6 +350,7 @@ class _PerfilState extends State<Perfil> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 240, 240, 240),
       body: ListView(
